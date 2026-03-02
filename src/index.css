@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: "Inter", "Segoe UI", sans-serif;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-slate-700 transition hover:bg-primary/10 hover:text-primary;
+  }
+
+  .nav-link-active {
+    @apply bg-primary/10 text-primary font-semibold;
+  }
+}
