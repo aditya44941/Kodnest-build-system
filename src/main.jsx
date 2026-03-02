@@ -9,11 +9,16 @@ import PracticePage from "./pages/PracticePage";
 import AssessmentsPage from "./pages/AssessmentsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import ProfilePage from "./pages/ProfilePage";
+import ResultsPage from "./pages/ResultsPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <LandingPage />,
+  },
+  {
+    path: "/results",
+    element: <ResultsPage />,
   },
   {
     path: "/app",
