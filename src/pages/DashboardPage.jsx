@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import {
   PolarAngleAxis,
@@ -19,12 +20,6 @@ const radarData = [
   { skill: "Aptitude", score: 70 },
 ];
 
-const upcomingAssessments = [
-  { title: "DSA Mock Test", time: "Tomorrow, 10:00 AM" },
-  { title: "System Design Review", time: "Wed, 2:00 PM" },
-  { title: "HR Interview Prep", time: "Friday, 11:00 AM" },
-];
-
 const weeklyDays = [
   { day: "Mon", active: true },
   { day: "Tue", active: true },
@@ -34,6 +29,157 @@ const weeklyDays = [
   { day: "Sat", active: true },
   { day: "Sun", active: false },
 ];
+
+function buildStudyAnalysis(rawTopic) {
+  const topic = rawTopic.trim();
+  if (!topic) return null;
+
+  const lower = topic.toLowerCase();
+
+  const tracks = [
+    {
+      keywords: ["dsa", "algorithm", "data structure", "dynamic programming", "graph"],
+      title: "DSA Mastery",
+      focus: "Prioritize problem patterns, complexity trade-offs, and timed coding drills.",
+      links: [
+        { label: "DSA roadmap", query: "DSA roadmap for placement preparation" },
+        { label: "Top coding patterns", query: "most important coding interview patterns" },
+        { label: "Practice sets", query: "DSA practice sheet for placements" },
+      ],
+    },
+    {
+      keywords: ["react", "frontend", "javascript", "typescript", "next"],
+      title: "Frontend Track",
+      focus: "Strengthen component architecture, state management, and performance optimization.",
+      links: [
+        { label: "React interview prep", query: "React interview questions and answers for freshers" },
+        { label: "Frontend system design", query: "frontend system design preparation" },
+        { label: "TypeScript essentials", query: "TypeScript concepts for frontend interviews" },
+      ],
+    },
+    {
+      keywords: ["node", "backend", "api", "express", "graphql", "rest"],
+      title: "Backend Track",
+      focus: "Focus on API design, scalability basics, and production-grade debugging workflows.",
+      links: [
+        { label: "Node.js interview prep", query: "Node.js backend interview preparation guide" },
+        { label: "REST API best practices", query: "REST API best practices interview" },
+        { label: "System design basics", query: "system design basics for backend interviews" },
+      ],
+    },
+    {
+      keywords: ["sql", "database", "postgres", "mysql", "mongodb", "redis"],
+      title: "Database Track",
+      focus: "Revise schema design, indexing, joins, and query optimization methods.",
+      links: [
+        { label: "SQL interview topics", query: "SQL interview questions indexing joins" },
+        { label: "Database design basics", query: "database design basics for interviews" },
+        { label: "Query optimization", query: "how to optimize SQL queries interview" },
+      ],
+    },
+    {
+      keywords: ["system design", "scalability", "architecture", "distributed"],
+      title: "System Design Track",
+      focus: "Practice trade-offs, component decomposition, and reliability-focused design decisions.",
+      links: [
+        { label: "System design primer", query: "system design interview beginner guide" },
+        { label: "Common architectures", query: "system design case studies interviews" },
+        { label: "Scalability fundamentals", query: "scalability concepts for software engineers" },
+      ],
+    },
+  ];
+
+  const matched = tracks.find((track) => track.keywords.some((keyword) => lower.includes(keyword)));
+
+  if (matched) {
+    return {
+      title: matched.title,
+      focus: matched.focus,
+      links: [
+        ...matched.links,
+        { label: `Google: ${topic}`, query: `${topic} placement study material` },
+      ],
+    };
+  }
+
+  return {
+    title: "General Placement Track",
+    focus: "Split study across aptitude, coding fundamentals, project storytelling, and mock interviews.",
+    links: [
+      { label: "General placement prep", query: `${topic} placement preparation guide` },
+      { label: "Interview question sets", query: `${topic} interview questions and answers` },
+      { label: "Revision resources", query: `${topic} complete revision notes` },
+    ],
+  };
+}
+
+function StudyDirectionCard() {
+  const [studyInput, setStudyInput] = useState("");
+  const [submittedTopic, setSubmittedTopic] = useState("");
+
+  const analysis = useMemo(() => buildStudyAnalysis(submittedTopic), [submittedTopic]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setSubmittedTopic(studyInput);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Study Direction Engine</CardTitle>
+        <CardDescription>
+          Tell us what you want to study. We analyze your focus and generate targeted Google study material links.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <label htmlFor="study-focus" className="text-sm font-medium text-slate-700">
+            What do you want to study?
+          </label>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              id="study-focus"
+              value={studyInput}
+              onChange={(e) => setStudyInput(e.target.value)}
+              placeholder="e.g. React state management, DSA graphs, SQL indexing"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-primary"
+              required
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
+            >
+              Analyze
+            </button>
+          </div>
+        </form>
+
+        {analysis ? (
+          <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">Track: {analysis.title}</p>
+            <p className="text-sm text-slate-600">{analysis.focus}</p>
+            <div className="space-y-2">
+              {analysis.links.map((link) => (
+                <a
+                  key={link.query}
+                  href={`https://www.google.com/search?q=${encodeURIComponent(link.query)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-primary hover:border-primary/40"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">Enter a topic and click Analyze to get study links.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 function OverallReadinessCard() {
   const radius = 78;
@@ -172,37 +318,16 @@ function WeeklyGoalsCard() {
   );
 }
 
-function UpcomingAssessmentsCard() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Upcoming Assessments</CardTitle>
-        <CardDescription>Stay ahead of your scheduled preparation events.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ul className="space-y-3">
-          {upcomingAssessments.map((item) => (
-            <li key={item.title} className="rounded-lg border border-slate-200 p-4">
-              <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-              <p className="mt-1 text-sm text-slate-600">{item.time}</p>
-            </li>
-          ))}
-        </ul>
-      </CardContent>
-    </Card>
-  );
-}
-
 function DashboardPage() {
   return (
     <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="lg:col-span-2">
+        <StudyDirectionCard />
+      </div>
       <OverallReadinessCard />
       <SkillBreakdownCard />
       <ContinuePracticeCard />
       <WeeklyGoalsCard />
-      <div className="lg:col-span-2">
-        <UpcomingAssessmentsCard />
-      </div>
     </section>
   );
 }
